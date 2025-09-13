@@ -1,70 +1,84 @@
 // prisma/schema.prisma
-// This file defines the structure of your database
+// Updated schema with BetterAuth tables
 
-// Generator: How Prisma creates the client code
 generator client {
   provider = "prisma-client-js"
 }
 
-// Datasource: Where your database lives
 datasource db {
-  provider = "postgresql"  
-  url      = env("DATABASE_URL") 
-  directUrl = env("DATABASE_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
-// USER TABLE - Stores user account information
+// ===== YOUR EXISTING MODELS =====
+
 model User {
-  id            String   @id @default(cuid())  // Unique ID for each user
-  email         String   @unique                // Email (must be unique)
-  name          String?                         // Optional name
-  password      String                          // Hashed password (we'll secure this)
-  createdAt     DateTime @default(now())        // When account was created
-  updatedAt     DateTime @updatedAt             // Last update time
+  id            String   @id @default(cuid())
+  email         String   @unique
+  name          String?
+  password      String   // BetterAuth will hash this
+  emailVerified Boolean  @default(false)  // Add this for email verification
+  image         String?  // Optional profile image
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
   
   // Relationships
-  chats         Chat[]   // One user can have many chats
+  chats         Chat[]
+  sessions      Session[]  // Add this for auth sessions
   
-  @@index([email])  // Makes email searches faster
+  @@index([email])
 }
 
-// CHAT TABLE - Represents a conversation session
 model Chat {
-  id            String   @id @default(cuid())  // Unique chat ID
-  title         String?                         // Optional chat title
-  userId        String                          // Which user owns this chat
-  createdAt     DateTime @default(now())        // When chat started
-  updatedAt     DateTime @updatedAt             // Last activity in chat
+  id            String   @id @default(cuid())
+  title         String?
+  userId        String
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
   
   // Relationships
   user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
-  messages      Message[] // One chat has many messages
+  messages      Message[]
   
-  @@index([userId])  // Makes finding user's chats faster
+  @@index([userId])
 }
 
-// MESSAGE TABLE - Individual messages in a chat
 model Message {
-  id            String   @id @default(cuid())  // Unique message ID
-  content       String   @db.Text               // The actual message text (can be long)
-  role          Role                            // Who sent it (user or assistant)
-  chatId        String                          // Which chat this belongs to
-  contentType   ContentType?                   // Type of content (article, tweet, etc.)
-  createdAt     DateTime @default(now())        // When message was sent
+  id            String   @id @default(cuid())
+  content       String   @db.Text
+  role          Role
+  chatId        String
+  contentType   ContentType?
+  createdAt     DateTime @default(now())
   
   // Relationships
   chat          Chat     @relation(fields: [chatId], references: [id], onDelete: Cascade)
   
-  @@index([chatId])  // Makes loading chat messages faster
+  @@index([chatId])
 }
 
-// ENUM - Defines who sent the message
+// ===== NEW BETTERAUTH MODELS =====
+
+model Session {
+  id            String   @id @default(cuid())
+  sessionToken  String   @unique  // The actual session token
+  userId        String             // Which user this session belongs to
+  expires       DateTime           // When this session expires
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  @@index([userId])
+}
+
+// ===== ENUMS =====
+
 enum Role {
-  USER      // The person using the app
-  ASSISTANT // The AI (Gemini)
+  USER
+  ASSISTANT
 }
 
-// ENUM - Types of content that can be generated
 enum ContentType {
   ARTICLE
   REPORT
