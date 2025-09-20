@@ -49,7 +49,6 @@ export default function HomePage() {
   return (
     <div className="flex h-screen bg-gray-50">
       
-      
       {/* Main Content */}
       <div className="flex-1 flex flex-col">
         {/* Header */}
@@ -58,7 +57,6 @@ export default function HomePage() {
             <h1 className="text-2xl font-semibold text-gray-800">
               AI Content Writer
             </h1>
-            
             <div className="flex items-center gap-4">
               
               <button
@@ -73,11 +71,6 @@ export default function HomePage() {
             </div>
           </div>
         </header>
-        
-       
-        
-        {/* Input */}
-        
       </div>
     </div>
   )
