@@ -2,3 +2,9 @@
 @import "tailwindcss";
 
 /* You can add your custom styles below if needed */
+
+.button{
+    background-color: #212121;
+    border-color: #525252;
+    border-width: 1px;
+};
