@@ -14,7 +14,7 @@ export default function HomePage() {
   // Not signed in - show landing page
   if (!isPending && !session) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-gray-50 to-gray-100">
+      <div className="min-h-screen">
         <div className="container mx-auto px-4 py-16">
           <div className="text-center max-w-3xl mx-auto">
             <h1 className="text-5xl font-bold text-gray-800 mb-6">

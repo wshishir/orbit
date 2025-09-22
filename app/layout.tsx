@@ -1,14 +1,13 @@
 import type { Metadata } from "next";
 import { ThemeProvider } from "@/components/theme-provider"
-import { Inter } from "next/font/google";
+import { Host_Grotesk, Inter } from "next/font/google";
 import "./globals.css";
 
 
-const inter = Inter({
+const host = Host_Grotesk({
   subsets: ["latin"],
-  display: "swap", // Better loading performance
-  variable: "--font-inter",
-});
+  display: "swap",
+}) ;
 
 export const metadata: Metadata = {
   title: "Create Next App",
@@ -23,7 +22,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${inter.variable} font-sans antialiased`}
+        className={`${host.className} antialiased`}
       >
         <ThemeProvider
             attribute="class"

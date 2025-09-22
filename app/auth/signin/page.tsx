@@ -10,6 +10,7 @@ import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Separator } from "@/components/ui/separator"
 import { Eye, EyeOff, ArrowLeft } from "lucide-react"
+import { Host_Grotesk } from "next/font/google"
 
 export default function SignInPage() {
   const router = useRouter()
@@ -29,16 +30,19 @@ export default function SignInPage() {
   }
   
   return (
-    <div className="min-h-screen flex font-sans">
+    <div className="min-h-screen flex">
       <div 
-        className="hidden lg:flex lg:w-1/2 relative overflow-hidden" 
-        style={{ 
-          backgroundImage: 'url(/bg.jpg)',
-          backgroundSize: 'cover',
-          backgroundPosition: 'center',
-          backgroundRepeat: 'no-repeat'
-        }}
+        className="hidden lg:flex lg:w-1/2 relative overflow-hidden"
       >
+        <Image
+          src="/bg.jpg"
+          alt=""
+          fill
+          priority
+          placeholder="empty"
+          sizes="(min-width: 1024px) 50vw, 100vw"
+          className="object-cover"
+        />
       </div>
 
       <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
