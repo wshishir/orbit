@@ -5,7 +5,7 @@ import { useSession, signOut } from "@/lib/auth-client"
 import { useRouter } from "next/navigation"
 import DarkVeil from '../components/ui/dark-deil';
 import Header from "@/components/Header";
-import Dashboard from "./(dashboard)/page";
+import Dashboard from "./new/page";
 
 export default function HomePage() {
   const { data: session, isPending } = useSession()

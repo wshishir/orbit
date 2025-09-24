@@ -6,11 +6,6 @@ import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
-import { Separator } from "@/components/ui/separator"
-import { Eye, EyeOff, ArrowLeft } from "lucide-react"
-import { Host_Grotesk } from "next/font/google"
 
 export default function SignInPage() {
   const router = useRouter()
@@ -21,7 +16,7 @@ export default function SignInPage() {
     try {
       await signIn.social({
         provider: "google",
-        callbackURL: "/" // Redirect to home after sign-in
+        callbackURL: "/new" // Redirect to home after sign-in
       })
     } catch (error) {
       console.error("Sign-in failed:", error)
