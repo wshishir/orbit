@@ -5,6 +5,8 @@ import { AppSidebar } from "@/components/app-sidebar"
 import { Separator } from "@/components/ui/separator"
 import { UserNav } from "@/components/user-nav"
 import { useSession } from "@/lib/auth-client"
+import { useRouter } from "next/navigation"
+import { useEffect } from "react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -23,8 +25,27 @@ import { Textarea } from "@/components/ui/textarea"
 import { useRef } from "react"
 
 export default function Page() {
-  const { data: session } = useSession();
+  const { data: session, isPending } = useSession();
+  const router = useRouter();
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  useEffect(() => {
+    if (!isPending && !session) {
+      router.push("/auth/signin");
+    }
+  }, [session, isPending, router]);
+
+  if (isPending) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-lg">Loading...</div>
+      </div>
+    );
+  }
+
+  if (!session) {
+    return null;
+  }
 
   const handleInput = () => {
     if (textareaRef.current) {
@@ -57,9 +78,9 @@ export default function Page() {
                       ref={textareaRef}
                       className="w-full min-h-[40px] rounded-none
              resize-y
-             placeholder:text-[16px] border-none text-white
+             placeholder:text-[18px] border-none text-white
             bg-transparent outline-none
-            scrollbar-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none]"
+            scrollbar-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] selection:bg-[#353434]"
                          placeholder="Ask me anything ..."
                          spellCheck={false}
                        rows={1}
@@ -70,7 +91,7 @@ export default function Page() {
             <div className="flex justify-between items-end mt-2">
               <div className="flex gap-2">
                 <DropdownMenu>
-                  <DropdownMenuTrigger className="bl py-1 px-2 flex">Improving<ChevronDown className=" ml-1 h-6 w-4"/></DropdownMenuTrigger>
+                  <DropdownMenuTrigger className="bl py-1 px-2 flex select-none">Improving<ChevronDown className=" ml-1 h-6 w-4"/></DropdownMenuTrigger>
                   <DropdownMenuContent className="bl border-none rounded-none">
                     <DropdownMenuItem>Profile</DropdownMenuItem>
                     <DropdownMenuItem>Billing</DropdownMenuItem>
@@ -79,7 +100,7 @@ export default function Page() {
                   </DropdownMenuContent>
                 </DropdownMenu>
                 <DropdownMenu>
-                <DropdownMenuTrigger className="bl py-1 px-2 flex">Article<ChevronDown className=" ml-1 h-6 w-4"/></DropdownMenuTrigger>
+                <DropdownMenuTrigger className="bl py-1 px-2 flex select-none">Article<ChevronDown className=" ml-1 h-6 w-4"/></DropdownMenuTrigger>
                   <DropdownMenuContent className="bl border-none rounded-none">
                     <DropdownMenuItem>Profile</DropdownMenuItem>
                     <DropdownMenuItem>Billing</DropdownMenuItem>

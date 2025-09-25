@@ -11,8 +11,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
+import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { LogOut } from "lucide-react"
+import Image from "next/image"
 
 export function UserNav() {
   const { data: session } = useSession()
@@ -40,13 +41,19 @@ export function UserNav() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Avatar className="h-8 w-8 cursor-pointer rounded-none">
-          <AvatarImage
-            src={session.user.image || ""}
-            alt={session.user.name || "User"}
-          />
-          <AvatarFallback className="bk text-white text-sm rounded-none">
-            {getInitials(session.user.name)}
-          </AvatarFallback>
+          {session.user.image ? (
+            <Image
+              src={session.user.image}
+              alt={session.user.name || "User"}
+              width={30}
+              height={30}
+              className="rounded-none"
+            />
+          ) : (
+            <AvatarFallback className="bk text-white text-sm rounded-none">
+              {getInitials(session.user.name)}
+            </AvatarFallback>
+          )}
         </Avatar>
       </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56 rounded-none button" align="end">
