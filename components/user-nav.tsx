@@ -40,11 +40,11 @@ export function UserNav() {
     <DropdownMenu>
       <DropdownMenuTrigger asChild>
         <Avatar className="h-8 w-8 cursor-pointer rounded-none">
-          <AvatarImage 
-            src={session.user.image || ""} 
-            alt={session.user.name || "User"} 
+          <AvatarImage
+            src={session.user.image || ""}
+            alt={session.user.name || "User"}
           />
-          <AvatarFallback className="bg-gray-700 text-white text-sm">
+          <AvatarFallback className="bk text-white text-sm rounded-none">
             {getInitials(session.user.name)}
           </AvatarFallback>
         </Avatar>
