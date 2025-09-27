@@ -1,12 +1,12 @@
-// main page
+// app/new/page.tsx - Updated version
 "use client"
 
 import { AppSidebar } from "@/components/app-sidebar"
 import { Separator } from "@/components/ui/separator"
 import { UserNav } from "@/components/user-nav"
 import { useSession } from "@/lib/auth-client"
-import { useRouter } from "next/navigation"
-import { useEffect } from "react"
+import { useRouter, useSearchParams } from "next/navigation"
+import { useEffect, useState, useRef } from "react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -18,43 +18,147 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
-import { ArrowDown, ChevronDown, Send } from "lucide-react"
+import { ChevronDown, Send, Loader2 } from "lucide-react"
 import { Textarea } from "@/components/ui/textarea"
-import { useRef } from "react"
+
+interface Message {
+  id: string
+  content: string
+  role: "USER" | "ASSISTANT"
+  contentType?: string
+  createdAt: string
+}
 
 export default function Page() {
-  const { data: session, isPending } = useSession();
-  const router = useRouter();
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const { data: session, isPending } = useSession()
+  const router = useRouter()
+  const searchParams = useSearchParams()
+  const textareaRef = useRef<HTMLTextAreaElement>(null)
+  
+  const [messages, setMessages] = useState<Message[]>([])
+  const [input, setInput] = useState("")
+  const [contentType, setContentType] = useState("GENERAL")
+  const [loading, setLoading] = useState(false)
+  const [currentChatId, setCurrentChatId] = useState<string | null>(null)
 
+  // Get chatId from URL
+  useEffect(() => {
+    const chatId = searchParams.get("chat")
+    if (chatId) {
+      setCurrentChatId(chatId)
+      loadChatMessages(chatId)
+    }
+  }, [searchParams])
+
+  // Load messages for a chat
+  const loadChatMessages = async (chatId: string) => {
+    try {
+      const response = await fetch(`/api/chats/${chatId}`)
+      if (response.ok) {
+        const chat = await response.json()
+        setMessages(chat.messages || [])
+      }
+    } catch (error) {
+      console.error("Failed to load chat:", error)
+    }
+  }
+
+  // Redirect if not logged in
   useEffect(() => {
     if (!isPending && !session) {
-      router.push("/auth/signin");
+      router.push("/auth/signin")
     }
-  }, [session, isPending, router]);
+  }, [session, isPending, router])
 
   if (isPending) {
     return (
       <div className="flex items-center justify-center h-screen">
-        <div className="text-lg">Loading...</div>
+        <Loader2 className="h-8 w-8 animate-spin" />
       </div>
-    );
+    )
   }
 
-  if (!session) {
-    return null;
-  }
+  if (!session) return null
 
   const handleInput = () => {
     if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto';
-      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+      textareaRef.current.style.height = 'auto'
+      textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`
     }
-  };
+  }
+
+  const handleSend = async () => {
+    if (!input.trim() || loading) return
+    
+    setLoading(true)
+    const userInput = input
+    setInput("") // Clear input immediately
+    
+    // Add user message to UI immediately
+    const tempUserMessage: Message = {
+      id: Date.now().toString(),
+      content: userInput,
+      role: "USER",
+      contentType,
+      createdAt: new Date().toISOString()
+    }
+    setMessages(prev => [...prev, tempUserMessage])
+    
+    try {
+      const response = await fetch("/api/generate", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          prompt: userInput,
+          contentType,
+          chatId: currentChatId
+        })
+      })
+      
+      if (!response.ok) throw new Error("Failed to generate")
+      
+      const data = await response.json()
+      
+      // Update with real messages from server
+      setMessages(prev => [
+        ...prev.slice(0, -1), // Remove temp message
+        data.userMessage,
+        data.aiMessage
+      ])
+      
+      // Update URL if new chat was created
+      if (!currentChatId && data.chatId) {
+        setCurrentChatId(data.chatId)
+        router.push(`/new?chat=${data.chatId}`)
+      }
+      
+    } catch (error) {
+      console.error("Failed to send message:", error)
+      // Remove the temporary message on error
+      setMessages(prev => prev.slice(0, -1))
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault()
+      handleSend()
+    }
+  }
+
+  const contentTypes = [
+    { value: "GENERAL", label: "General" },
+    { value: "ARTICLE", label: "Article" },
+    { value: "REPORT", label: "Report" },
+    { value: "LINKEDIN_POST", label: "LinkedIn Post" },
+    { value: "TWEET", label: "Tweet" },
+  ]
 
   return (
     <SidebarProvider>
-      <AppSidebar/>
+      <AppSidebar />
       <SidebarInset>
         <header className="flex h-16 shrink-0 items-center justify-between gap-2 px-4">
           <div className="flex items-center gap-2">
@@ -64,52 +168,103 @@ export default function Page() {
               className="mr-2 data-[orientation=vertical]:h-4"
             />
           </div>
-          
           <UserNav />
         </header>
         
-        {/* main content here */}
-        <main className="flex flex-col items-center justify-center h-[calc(100vh-4rem)] gap-6 px-4">
-          <h2 className="text-[38px] font-semibold text-center">What do you want to explore, {session?.user.name?.split(' ')[0]}?</h2>
-          <div className="container w-full max-w-2xl border border-[#616161] bg-[#616161] flex flex-col p-2 min-h-fit">
-          <Textarea
-                      ref={textareaRef}
-                      className="w-full min-h-[40px] rounded-none
-             resize-y
-             placeholder:text-[18px] border-none text-white
-            bg-transparent outline-none
-            scrollbar-none [&::-webkit-scrollbar]:hidden [-ms-overflow-style:none] [scrollbar-width:none] selection:bg-[#353434]"
-                         placeholder="Ask me anything ..."
-                         spellCheck={false}
-                       rows={1}
-                       onInput={handleInput}
-
-                       
-                      />
-            <div className="flex justify-between items-end mt-2">
-              <div className="flex gap-2">
-                <DropdownMenu>
-                  <DropdownMenuTrigger className="bl py-1 px-2 flex select-none">Improving<ChevronDown className=" ml-1 h-6 w-4"/></DropdownMenuTrigger>
-                  <DropdownMenuContent className="bl border-none rounded-none">
-                    <DropdownMenuItem>Profile</DropdownMenuItem>
-                    <DropdownMenuItem>Billing</DropdownMenuItem>
-                    <DropdownMenuItem>Team</DropdownMenuItem>
-                    <DropdownMenuItem>Subscription</DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
-                <DropdownMenu>
-                <DropdownMenuTrigger className="bl py-1 px-2 flex select-none">Article<ChevronDown className=" ml-1 h-6 w-4"/></DropdownMenuTrigger>
-                  <DropdownMenuContent className="bl border-none rounded-none">
-                    <DropdownMenuItem>Profile</DropdownMenuItem>
-                    <DropdownMenuItem>Billing</DropdownMenuItem>
-                    <DropdownMenuItem>Team</DropdownMenuItem>
-                    <DropdownMenuItem>Subscription</DropdownMenuItem>
-                  </DropdownMenuContent>
-                </DropdownMenu>
+        <main className="flex flex-col h-[calc(100vh-4rem)]">
+          {/* Messages Area */}
+          <div className="flex-1 overflow-y-auto p-6">
+            {messages.length === 0 ? (
+              <div className="flex flex-col items-center justify-center h-full">
+                <h2 className="text-[38px] font-semibold text-center">
+                  What do you want to explore, {session?.user.name?.split(' ')[0]}?
+                </h2>
               </div>
-              <button className="cursor-pointer p-1.5 bg-[#AAAAAA] hover:bg-[#999999] transition-colors">
-                <Send width={20} height={20}/>
-              </button>
+            ) : (
+              <div className="max-w-3xl mx-auto space-y-6">
+                {messages.map((message) => (
+                  <div
+                    key={message.id}
+                    className={`${
+                      message.role === "USER" 
+                        ? "ml-auto max-w-[80%]" 
+                        : "mr-auto max-w-[80%]"
+                    }`}
+                  >
+                    <div
+                      className={`p-4 rounded-lg ${
+                        message.role === "USER"
+                          ? "bg-[#616161] text-white"
+                          : "bg-[#2A2A2A] text-gray-200"
+                      }`}
+                    >
+                      <p className="whitespace-pre-wrap">{message.content}</p>
+                    </div>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {message.role === "USER" ? "You" : "AI"}
+                    </p>
+                  </div>
+                ))}
+                {loading && (
+                  <div className="flex items-center gap-2 text-gray-400">
+                    <Loader2 className="h-4 w-4 animate-spin" />
+                    <span>AI is thinking...</span>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+          
+          {/* Input Area */}
+          <div className="p-4 border-t">
+            <div className="max-w-3xl mx-auto">
+              <div className="border border-[#616161] bg-[#616161] p-2">
+                <Textarea
+                  ref={textareaRef}
+                  value={input}
+                  onChange={(e) => setInput(e.target.value)}
+                  onKeyPress={handleKeyPress}
+                  className="w-full min-h-[40px] rounded-none resize-none
+                    placeholder:text-[18px] border-none text-white
+                    bg-transparent outline-none"
+                  placeholder="Ask me anything..."
+                  spellCheck={false}
+                  rows={1}
+                  onInput={handleInput}
+                  disabled={loading}
+                />
+                <div className="flex justify-between items-end mt-2">
+                  <DropdownMenu>
+                    <DropdownMenuTrigger className="bl py-1 px-2 flex select-none">
+                      {contentTypes.find(t => t.value === contentType)?.label}
+                      <ChevronDown className="ml-1 h-6 w-4" />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="bl border-none rounded-none">
+                      {contentTypes.map(type => (
+                        <DropdownMenuItem
+                          key={type.value}
+                          onClick={() => setContentType(type.value)}
+                        >
+                          {type.label}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                  
+                  <button
+                    onClick={handleSend}
+                    disabled={loading || !input.trim()}
+                    className="cursor-pointer p-1.5 bg-[#AAAAAA] hover:bg-[#999999] 
+                      transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {loading ? (
+                      <Loader2 className="h-5 w-5 animate-spin" />
+                    ) : (
+                      <Send width={20} height={20} />
+                    )}
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </main>
