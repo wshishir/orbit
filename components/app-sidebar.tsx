@@ -80,7 +80,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent className="bk">
         <button 
           onClick={handleNewChat}
-          className="bg-[#7E7E7E] mx-6 mt-5 py-2 cursor-pointer hover:bg-[#6E6E6E] transition-colors"
+          className="bg-black mx-6 mt-5 py-2 cursor-pointer"
         >
           New Chat
         </button>
