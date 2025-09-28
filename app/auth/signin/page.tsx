@@ -26,28 +26,20 @@ export default function SignInPage() {
   
   return (
     <div className="min-h-screen flex">
-      <div 
-        className="hidden lg:flex lg:w-1/2 relative overflow-hidden"
-      >
-        <Image
-          src="/bg.jpg"
-          alt=""
-          fill
-          priority
-          placeholder="empty"
-          sizes="(min-width: 1024px) 50vw, 100vw"
-          className="object-cover"
-        />
-      </div>
+      
 
-      <div className="w-full lg:w-1/2 flex items-center justify-center p-8">
-        <div className="w-full max-w-md space-y-8">
+      <div className="w-full flex items-center justify-center ">
+      <div
+        className="fixed inset-0 bg-cover bg-center bg-no-repeat z-0"
+        style={{ backgroundImage: 'url(/moon.png)' }}
+      />
+        <div className="w-full max-w-md h-1/12  p-14 rounded-2xl z-20 ">
           <div className="space-y-6">
               <>
                 <div className="items-center justify-center">
-                  <p className="flex items-center justify-center text-2xl font-semibold pb-10">Sign in to orbit.chat</p>
+                  <p className="flex items-center justify-center text-2xl font-semibold pb-10">Sign in to orbit</p>
                   <Button
-                    className="h-11 rounded-none bg-[#212121] shadow-none cursor-pointer w-full border border-[#525252]"
+                    className="h-11 rounded-2xl text-black hover:bg-gray-100 shadow-none cursor-pointer w-full bg-white"
                     onClick={handleGoogleSignIn}
                   >
                     <svg className="w-5 h-5 mr-1" viewBox="0 0 24 24">

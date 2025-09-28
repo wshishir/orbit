@@ -47,16 +47,16 @@ export function UserNav() {
               alt={session.user.name || "User"}
               width={30}
               height={30}
-              className="rounded-none"
+              className="rounded-xl"
             />
           ) : (
-            <AvatarFallback className="bk text-white text-sm rounded-none">
+            <AvatarFallback className="bg-white text-black text-sm rounded-xl">
               {getInitials(session.user.name)}
             </AvatarFallback>
           )}
         </Avatar>
       </DropdownMenuTrigger>
-      <DropdownMenuContent className="w-56 rounded-none button" align="end">
+      <DropdownMenuContent className="w-56 rounded-xl" align="end">
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
             <p className="text-sm font-medium leading-none">
@@ -70,7 +70,7 @@ export function UserNav() {
         <DropdownMenuSeparator />
         <DropdownMenuItem 
           onClick={handleSignOut}
-          className="cursor-pointer text-red-600 focus:text-red-600"
+          className="cursor-pointer text-red-600"
         >
           <LogOut className="mr-2 h-4 w-4" />
           <span>Sign out</span>
