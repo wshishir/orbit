@@ -115,7 +115,11 @@ export default function Page() {
         })
       })
       
-      if (!response.ok) throw new Error("Failed to generate")
+      if (!response.ok) {
+        const errorData = await response.json()
+        console.error("API Error:", errorData)
+        throw new Error(errorData.error || "Failed to generate")
+      }
       
       const data = await response.json()
       
