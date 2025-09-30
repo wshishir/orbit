@@ -3,18 +3,27 @@
 
 import { useRouter } from "next/navigation"
 import Lenis from 'lenis'
+import { useEffect } from 'react'
 
 export default function HomePage() {
   const router = useRouter()
-  // Initialize Lenis
-const lenis = new Lenis({
-  autoRaf: true,
-});
 
-// Listen for the scroll event and log the event data
-lenis.on('scroll', (e) => {
-  console.log(e);
-});
+  useEffect(() => {
+    // Initialize Lenis only on client side1
+    const lenis = new Lenis({
+      autoRaf: true,
+    });
+
+    // Listen for the scroll event and log the event data
+    lenis.on('scroll', (e) => {
+      console.log(e);
+    });
+
+    // Cleanup on unmount
+    return () => {
+      lenis.destroy();
+    };
+  }, []);
 
   return (
     <div>
