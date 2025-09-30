@@ -10,7 +10,7 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar"
-import { MessageSquare, Trash2 } from "lucide-react"
+import { MessageSquare, Trash2, X } from "lucide-react"
 
 interface Chat {
   id: string
@@ -77,10 +77,10 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarHeader className="text-4xl items-center justify-center font-semibold mt-1.5 border-b mx-6">
         Orbit.chat
       </SidebarHeader>
-      <SidebarContent className="bk">
+      <SidebarContent>
         <button 
           onClick={handleNewChat}
-          className="bg-black mx-6 mt-5 py-2 cursor-pointer"
+          className=" font-semibold mx-3 mt-5 py-2 cursor-pointer rounded-lg bg-white text-black"
         >
           New Chat
         </button>
@@ -95,21 +95,21 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
               <div
                 key={chat.id}
                 onClick={() => handleSelectChat(chat.id)}
-                className={`group flex items-center justify-between p-2 cursor-pointer hover:bg-[#2A2A2A] transition-colors ${
+                className={`group flex items-center justify-between p-2 cursor-pointer hover:bg-[#2A2A2A] transition-colors rounded-lg ${
                   selectedChatId === chat.id ? 'bg-[#2A2A2A]' : ''
                 }`}
               >
                 <div className="flex items-center gap-2 flex-1 min-w-0">
-                  <MessageSquare className="h-4 w-4 text-gray-400 flex-shrink-0" />
-                  <span className="text-sm text-gray-200 truncate">
+                  <MessageSquare className="h-4 w-4 text-gray-300 flex-shrink-0" />
+                  <span className="text-sm text-gray-300 truncate">
                     {chat.title}
                   </span>
                 </div>
                 <button
                   onClick={(e) => handleDeleteChat(chat.id, e)}
-                  className="opacity-0 group-hover:opacity-100 p-1 hover:bg-red-900/50 rounded transition-opacity"
+                  className="opacity-0 group-hover:opacity-100 p-1 "
                 >
-                  <Trash2 className="h-3 w-3 text-red-400" />
+                  <X className="h-3 w-3 text-gray-300 cursor-pointer hover:text-red-300" />
                 </button>
               </div>
             ))}

@@ -18,7 +18,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
-import { ChevronDown, Send, Loader2 } from "lucide-react"
+import { ChevronDown, Send, Loader2, SendHorizonal, Ellipsis } from "lucide-react"
 import { Textarea } from "@/components/ui/textarea"
 
 interface Message {
@@ -204,15 +204,11 @@ export default function Page() {
                     >
                       <p className="whitespace-pre-wrap">{message.content}</p>
                     </div>
-                    <p className="text-xs text-gray-500 mt-1">
-                      {message.role === "USER" ? "You" : "AI"}
-                    </p>
                   </div>
                 ))}
                 {loading && (
                   <div className="flex items-center gap-2 text-gray-400">
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                    <span>AI is thinking...</span>
+                    <Ellipsis className="h-4 w-4 animate-spin" />
                   </div>
                 )}
               </div>
@@ -220,34 +216,35 @@ export default function Page() {
           </div>
           
           {/* Input Area */}
-          <div className="p-4 border-t">
+          <div className="p-4 pb-0 pt-1">
             <div className="max-w-3xl mx-auto">
-              <div className="border border-[#616161] bg-[#616161] p-2">
+              <div className="bg-[#18181b] p-2  rounded-t-xl">
                 <Textarea
                   ref={textareaRef}
                   value={input}
                   onChange={(e) => setInput(e.target.value)}
                   onKeyPress={handleKeyPress}
                   className="w-full min-h-[40px] rounded-none resize-none
-                    placeholder:text-[18px] border-none text-white
+                    placeholder:text-[15px] border-none text-white
                     bg-transparent outline-none"
-                  placeholder="Ask me anything..."
+                  placeholder="Type your message here..."
                   spellCheck={false}
                   rows={1}
                   onInput={handleInput}
                   disabled={loading}
                 />
-                <div className="flex justify-between items-end mt-2">
+                <div className="flex justify-between items-end mt-4">
                   <DropdownMenu>
-                    <DropdownMenuTrigger className="bl py-1 px-2 flex select-none">
+                    <DropdownMenuTrigger className="border rounded-lg py-1 px-4 flex select-none">
                       {contentTypes.find(t => t.value === contentType)?.label}
                       <ChevronDown className="ml-1 h-6 w-4" />
                     </DropdownMenuTrigger>
-                    <DropdownMenuContent className="bl border-none rounded-none">
+                    <DropdownMenuContent className="bg-[#18181b] border rounded-lg">
                       {contentTypes.map(type => (
                         <DropdownMenuItem
                           key={type.value}
                           onClick={() => setContentType(type.value)}
+                          className="hover:bg-black"
                         >
                           {type.label}
                         </DropdownMenuItem>
@@ -258,13 +255,13 @@ export default function Page() {
                   <button
                     onClick={handleSend}
                     disabled={loading || !input.trim()}
-                    className="cursor-pointer p-1.5 bg-[#AAAAAA] hover:bg-[#999999] 
+                    className="cursor-pointer p-1.5 
                       transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {loading ? (
-                      <Loader2 className="h-5 w-5 animate-spin" />
+                      <Ellipsis className="h-5 w-5 animate-spin" />
                     ) : (
-                      <Send width={20} height={20} />
+                      <SendHorizonal width={20} height={20} />
                     )}
                   </button>
                 </div>
