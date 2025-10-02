@@ -1,4 +1,3 @@
-// app/new/page.tsx - Updated version
 "use client"
 
 import { AppSidebar } from "@/components/app-sidebar"
@@ -47,6 +46,9 @@ export default function Page() {
     if (chatId) {
       setCurrentChatId(chatId)
       loadChatMessages(chatId)
+    } else {
+      setMessages([])
+      setCurrentChatId(null)
     }
   }, [searchParams])
 
@@ -228,13 +230,14 @@ export default function Page() {
                   className="w-full min-h-[40px] rounded-none resize-none
                     placeholder:text-[15px] border-none text-white
                     bg-transparent outline-none"
-                  placeholder="Type your message here..."
+                  placeholder="Explain your content here..."
                   spellCheck={false}
                   rows={1}
                   onInput={handleInput}
                   disabled={loading}
                 />
                 <div className="flex justify-between items-end mt-4">
+                  <div className="flex gap-3">
                   <DropdownMenu>
                     <DropdownMenuTrigger className="border rounded-lg py-1 px-4 flex select-none">
                       {contentTypes.find(t => t.value === contentType)?.label}
@@ -252,6 +255,24 @@ export default function Page() {
                       ))}
                     </DropdownMenuContent>
                   </DropdownMenu>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger className="border rounded-lg py-1 px-4 flex select-none">
+                      {contentTypes.find(t => t.value === contentType)?.label}
+                      <ChevronDown className="ml-1 h-6 w-4" />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="bg-[#18181b] border rounded-lg">
+                      {contentTypes.map(type => (
+                        <DropdownMenuItem
+                          key={type.value}
+                          onClick={() => setContentType(type.value)}
+                          className="hover:bg-black"
+                        >
+                          {type.label}
+                        </DropdownMenuItem>
+                      ))}
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                  </div>
                   
                   <button
                     onClick={handleSend}

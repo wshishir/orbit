@@ -10,7 +10,7 @@ import {
   SidebarHeader,
   SidebarRail,
 } from "@/components/ui/sidebar"
-import { MessageSquare, Trash2, X } from "lucide-react"
+import { MessageSquare, Plus, Trash2, X } from "lucide-react"
 
 interface Chat {
   id: string
@@ -80,9 +80,9 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         <button 
           onClick={handleNewChat}
-          className=" font-semibold mx-3 mt-5 py-2 cursor-pointer rounded-lg bg-white text-black"
+          className="flex gap-2 hover:bg-gray-100 font-semibold mt-5 mx-3 py-2  cursor-pointer rounded-lg bg-white text-black items-center justify-center"
         >
-          New Chat
+         <Plus className="h-5 w-5"/> New Chat
         </button>
         
         {loading ? (
