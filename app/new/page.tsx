@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/sidebar"
 import { ChevronDown, Send, Loader2, SendHorizonal, Ellipsis, Copy } from "lucide-react"
 import { Textarea } from "@/components/ui/textarea"
+import fontBricolage from "@/app/font";
 
 interface Message {
   id: string
@@ -176,17 +177,20 @@ export default function Page() {
           </div>
           <UserNav />
         </header>
-        
+
         <main className="flex flex-col h-[calc(100vh-4rem)]">
+          {/* Greeting Section */}
+          {messages.length === 0 && (
+            <div className="flex items-center justify-center py-8">
+              <h2 className={`${fontBricolage} text-[38px] font-semibold text-center`}>
+                What do you want to exploreeee, {session?.user.name?.split(' ')[0]}?
+              </h2>
+            </div>
+          )}
+
           {/* Messages Area */}
-          <div className="flex-1 overflow-y-auto p-6">
-            {messages.length === 0 ? (
-              <div className="flex flex-col items-center justify-center h-full">
-                <h2 className="text-[38px] font-semibold text-center">
-                  What do you want to explore, {session?.user.name?.split(' ')[0]}?
-                </h2>
-              </div>
-            ) : (
+          <div className="flex-1 overflow-y-auto p-6 ">
+            {messages.length > 0 && (
               <div className="max-w-3xl mx-auto space-y-6">
                 {messages.map((message) => (
                   <div

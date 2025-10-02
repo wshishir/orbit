@@ -80,7 +80,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
       <SidebarContent>
         <button 
           onClick={handleNewChat}
-          className="flex gap-2 hover:bg-gray-100 font-semibold mt-5 mx-3 py-2  cursor-pointer rounded-lg bg-white text-black items-center justify-center"
+          className="flex gap-1.5 hover:bg-gray-100 font-semibold mt-5 mx-3 py-2  cursor-pointer rounded-lg bg-white text-black items-center justify-center"
         >
          <Plus className="h-5 w-5"/> New Chat
         </button>
