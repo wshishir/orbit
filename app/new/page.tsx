@@ -18,7 +18,7 @@ import {
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
-import { ChevronDown, Send, Loader2, SendHorizonal, Ellipsis } from "lucide-react"
+import { ChevronDown, Send, Loader2, SendHorizonal, Ellipsis, Copy } from "lucide-react"
 import { Textarea } from "@/components/ui/textarea"
 
 interface Message {
@@ -198,12 +198,13 @@ export default function Page() {
                     <div
                       className={`p-4 rounded-lg ${
                         message.role === "USER"
-                          ? "bg-[#616161] text-white"
-                          : "bg-[#2A2A2A] text-gray-200"
+                          ? "bg-[#262626] text-white"
+                          : "bg-[#27272a] text-gray-200"
                       }`}
                     >
                       <p className="whitespace-pre-wrap">{message.content}</p>
                     </div>
+                    <span className="flex justify-end mt-1 cursor-pointer mr-1"><Copy className="w-4 h-4"/></span>
                   </div>
                 ))}
                 {loading && (
@@ -218,7 +219,7 @@ export default function Page() {
           {/* Input Area */}
           <div className="p-4 pb-0 pt-1">
             <div className="max-w-3xl mx-auto">
-              <div className="bg-[#18181b] p-2  rounded-t-xl">
+              <div className="bg-[#1f1f1f] p-2  rounded-t-xl">
                 <Textarea
                   ref={textareaRef}
                   value={input}
