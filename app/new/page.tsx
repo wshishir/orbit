@@ -19,8 +19,8 @@ import {
 } from "@/components/ui/sidebar"
 import { ChevronDown, Send, Loader2, SendHorizonal, Ellipsis, Copy } from "lucide-react"
 import { Textarea } from "@/components/ui/textarea"
-import fontBricolage from "@/app/font";
-import { Card } from "@/components/ui/card"
+import { FileText } from 'lucide-react';
+import { BriefcaseBusiness } from 'lucide-react';
 
 interface Message {
   id: string
@@ -165,15 +165,9 @@ export default function Page() {
   ]
   const dummyPrompts = [
     {
-      text: "Write a quarterly performance report analyzing sales growth, customer retention metrics, and market expansion opportunities for a SaaS company",
-      type: "REPORT",
-      icon: "📊",
-      label: "Performance Report"
-    },
-    {
       text: "Create a LinkedIn post about the importance of work-life balance for remote developers and tips for maintaining productivity",
       type: "LINKEDIN_POST",
-      icon: "💼",
+      icon: BriefcaseBusiness,
       label: "LinkedIn Post"
     },
     {
@@ -185,7 +179,7 @@ export default function Page() {
     {
       text: "Generate an article about the top 5 emerging AI trends that will transform businesses in 2025",
       type: "ARTICLE",
-      icon: "📝",
+      icon: FileText,
       label: "Article"
     }
   ]
@@ -230,7 +224,9 @@ export default function Page() {
             rounded-lg text-left transition-all hover:scale-[1.02] cursor-pointer"
         >
           <div className="flex items-center gap-2 mb-2">
-            <span className="text-xl">{prompt.icon}</span>
+            <span className="text-xl">
+              {typeof prompt.icon === 'string' ? prompt.icon : <prompt.icon className="w-5 h-5" />}
+            </span>
             <span className="text-sm font-medium ">
               {prompt.label}
             </span>
