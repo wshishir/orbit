@@ -20,6 +20,7 @@ import {
 import { ChevronDown, Send, Loader2, SendHorizonal, Ellipsis, Copy } from "lucide-react"
 import { Textarea } from "@/components/ui/textarea"
 import fontBricolage from "@/app/font";
+import { Card } from "@/components/ui/card"
 
 interface Message {
   id: string
@@ -162,6 +163,38 @@ export default function Page() {
     { value: "LINKEDIN_POST", label: "LinkedIn Post" },
     { value: "TWEET", label: "Tweet" },
   ]
+  const dummyPrompts = [
+    {
+      text: "Write a quarterly performance report analyzing sales growth, customer retention metrics, and market expansion opportunities for a SaaS company",
+      type: "REPORT",
+      icon: "📊",
+      label: "Performance Report"
+    },
+    {
+      text: "Create a LinkedIn post about the importance of work-life balance for remote developers and tips for maintaining productivity",
+      type: "LINKEDIN_POST",
+      icon: "💼",
+      label: "LinkedIn Post"
+    },
+    {
+      text: "Write a tweet announcing a new AI-powered feature that helps users save 3 hours per week on content creation",
+      type: "TWEET",
+      icon: "𝕏",
+      label: "Tweet"
+    },
+    {
+      text: "Generate an article about the top 5 emerging AI trends that will transform businesses in 2025",
+      type: "ARTICLE",
+      icon: "📝",
+      label: "Article"
+    }
+  ]
+
+  const handleDummyPromptClick= ( prompt: string, type: string ) =>{
+    setInput(prompt)
+    setContentType(type)
+    textareaRef.current?.focus()
+  }
 
   return (
     <SidebarProvider>
@@ -181,10 +214,33 @@ export default function Page() {
         <main className="flex flex-col h-[calc(100vh-4rem)]">
           {/* Greeting Section */}
           {messages.length === 0 && (
-            <div className="flex items-center justify-center py-8">
-              <h2 className={`${fontBricolage} text-[38px] font-semibold text-center`}>
-                What do you want to exploreeee, {session?.user.name?.split(' ')[0]}?
+            <div className="flex flex-col items-center justify-center pt-8">
+              <div className="">
+              <h2 className="text-[38px] font-semibold text-left">
+                Hi there, {session?.user.name?.split(' ')[0]}
               </h2>
+              <h3 className="text-[38px] font-semibold text-left">What would you like to create?</h3>
+              </div>
+              <div className="grid grid-cols-2 max-w-2xl gap-4 w-full px-4 mt-10">
+              {dummyPrompts.map((prompt, index) => (
+        <button
+          key={index}
+          onClick={() => handleDummyPromptClick(prompt.text, prompt.type)}
+          className="group p-4 bg-[#2A2A2A] hover:bg-[#333333] border border-[#404040] 
+            rounded-lg text-left transition-all hover:scale-[1.02] cursor-pointer"
+        >
+          <div className="flex items-center gap-2 mb-2">
+            <span className="text-xl">{prompt.icon}</span>
+            <span className="text-sm font-medium ">
+              {prompt.label}
+            </span>
+          </div>
+          <p className="text-sm text-gray-300 line-clamp-2 group-hover:text-white transition-colors">
+            {prompt.text}
+          </p>
+        </button>
+      ))}
+              </div>
             </div>
           )}
 

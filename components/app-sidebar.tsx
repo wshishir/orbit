@@ -11,6 +11,7 @@ import {
   SidebarRail,
 } from "@/components/ui/sidebar"
 import { MessageSquare, Plus, Trash2, X } from "lucide-react"
+import fontBricolage from "@/app/font"
 
 interface Chat {
   id: string
@@ -74,7 +75,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
 
   return (
     <Sidebar {...props}>
-      <SidebarHeader className="text-4xl items-center justify-center font-semibold mt-1.5 border-b mx-6">
+      <SidebarHeader className={`${fontBricolage} text-4xl items-center justify-center font-semibold mt-1.5 border-b mx-6`}>
         Orbit.chat
       </SidebarHeader>
       <SidebarContent>
@@ -116,7 +117,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
           </div>
         )}
       </SidebarContent>
-      <SidebarRail />
+      <SidebarRail/>
     </Sidebar>
   )
 }
