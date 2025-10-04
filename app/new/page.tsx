@@ -165,22 +165,19 @@ export default function Page() {
   ]
   const dummyPrompts = [
     {
-      text: "Create a LinkedIn post about the importance of work-life balance for remote developers and tips for maintaining productivity",
+      text: "Create a LinkedIn post about the importance of work-life balance.",
       type: "LINKEDIN_POST",
       icon: BriefcaseBusiness,
-      label: "LinkedIn Post"
     },
     {
-      text: "Write a tweet announcing a new AI-powered feature that helps users save 3 hours per week on content creation",
+      text: "Write a tweet announcing a new AI-powered feature.",
       type: "TWEET",
       icon: "𝕏",
-      label: "Tweet"
     },
     {
-      text: "Generate an article about the top 5 emerging AI trends that will transform businesses in 2025",
+      text: "Generate an email to reply to a job offer.",
       type: "ARTICLE",
       icon: FileText,
-      label: "Article"
     }
   ]
 
@@ -208,30 +205,27 @@ export default function Page() {
         <main className="flex flex-col h-[calc(100vh-4rem)]">
           {/* Greeting Section */}
           {messages.length === 0 && (
-            <div className="flex flex-col items-center justify-center pt-8">
-              <div className="">
-              <h2 className="text-[38px] font-semibold text-left">
-                Hi there, {session?.user.name?.split(' ')[0]}
+            <div className="flex flex-col pt-8 items-center justify-center">
+              <div className="w-full max-w-3xl">
+              <h2 className="text-[38px] font-semibold ">
+                Hi there, {session?.user.name?.split(' ')[0]} 👋🏼
               </h2>
-              <h3 className="text-[38px] font-semibold text-left">What would you like to create?</h3>
+              <h3 className="text-[38px] font-semibold">What would you like to create?</h3>
               </div>
-              <div className="grid grid-cols-2 max-w-2xl gap-4 w-full px-4 mt-10">
+              <div className="grid grid-cols-3 max-w-3xl  gap-4 w-full mt-8">
               {dummyPrompts.map((prompt, index) => (
         <button
           key={index}
           onClick={() => handleDummyPromptClick(prompt.text, prompt.type)}
-          className="group p-4 bg-[#2A2A2A] hover:bg-[#333333] border border-[#404040] 
+          className="group p-3 bg-[#1f1f1f] 
             rounded-lg text-left transition-all hover:scale-[1.02] cursor-pointer"
         >
-          <div className="flex items-center gap-2 mb-2">
+          <div className="flex items-center gap-2 mb-4">
             <span className="text-xl">
-              {typeof prompt.icon === 'string' ? prompt.icon : <prompt.icon className="w-5 h-5" />}
-            </span>
-            <span className="text-sm font-medium ">
-              {prompt.label}
+              {typeof prompt.icon === 'string' ? prompt.icon : <prompt.icon className="w-5 h-5 text-gray-300" />}
             </span>
           </div>
-          <p className="text-sm text-gray-300 line-clamp-2 group-hover:text-white transition-colors">
+          <p className="text-sm text-white line-clamp-2  tracking-tight">
             {prompt.text}
           </p>
         </button>
