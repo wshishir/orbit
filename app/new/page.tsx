@@ -12,12 +12,13 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
+import ReactMarkdown from 'react-markdown'
 import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
 } from "@/components/ui/sidebar"
-import { ChevronDown, Send, Loader2, SendHorizonal, Ellipsis, Copy } from "lucide-react"
+import { ChevronDown, Send, Loader2, SendHorizonal, Ellipsis, Copy, Disc, ArrowRightIcon, SquareArrowRight, ArrowRight } from "lucide-react"
 import { Textarea } from "@/components/ui/textarea"
 import { FileText } from 'lucide-react';
 import { BriefcaseBusiness } from 'lucide-react';
@@ -218,10 +219,10 @@ export default function Page() {
           key={index}
           onClick={() => handleDummyPromptClick(prompt.text, prompt.type)}
           className="group p-3 bg-[#1f1f1f] 
-            rounded-lg text-left transition-all hover:scale-[1.02] cursor-pointer"
+            rounded-xl text-left transition-all hover:scale-[1.02] cursor-pointer"
         >
-          <div className="flex items-center gap-2 mb-4">
-            <span className="text-xl">
+          <div className="flex items-center gap-2 mb-7">
+            <span className="text-lg">
               {typeof prompt.icon === 'string' ? prompt.icon : <prompt.icon className="w-5 h-5 text-gray-300" />}
             </span>
           </div>
@@ -254,7 +255,17 @@ export default function Page() {
                           : "bg-[#27272a] text-gray-200"
                       }`}
                     >
-                      <p className="whitespace-pre-wrap">{message.content}</p>
+                      <ReactMarkdown 
+  components={{
+    h1: ({node, ...props}) => <h1 className="text-2xl font-bold mt-4 mb-2" {...props} />,
+    h2: ({node, ...props}) => <h2 className="text-xl font-semibold mt-3 mb-2" {...props} />,
+    h3: ({node, ...props}) => <h3 className="text-lg font-semibold mt-2 mb-1" {...props} />,
+    strong: ({node, ...props}) => <strong className="font-bold" {...props} />,
+    p: ({node, ...props}) => <p className="mb-3 text-md" {...props} />,
+  }}
+>
+  {message.content}
+</ReactMarkdown>
                     </div>
                     <span className="flex justify-end mt-1 cursor-pointer mr-1"><Copy className="w-4 h-4"/></span>
                   </div>
@@ -286,29 +297,12 @@ export default function Page() {
                   onInput={handleInput}
                   disabled={loading}
                 />
-                <div className="flex justify-between items-end mt-4">
+                <div className="flex justify-between items-end mt-6 mx-1 mb-1">
                   <div className="flex gap-3">
                   <DropdownMenu>
-                    <DropdownMenuTrigger className="border rounded-lg py-1 px-4 flex select-none">
+                    <DropdownMenuTrigger className="rounded-full py-0.5 px-4 flex select-none bg-white text-black font-semibold">
                       {contentTypes.find(t => t.value === contentType)?.label}
-                      <ChevronDown className="ml-1 h-6 w-4" />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent className="bg-[#18181b] border rounded-lg">
-                      {contentTypes.map(type => (
-                        <DropdownMenuItem
-                          key={type.value}
-                          onClick={() => setContentType(type.value)}
-                          className="hover:bg-black"
-                        >
-                          {type.label}
-                        </DropdownMenuItem>
-                      ))}
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger className="border rounded-lg py-1 px-4 flex select-none">
-                      {contentTypes.find(t => t.value === contentType)?.label}
-                      <ChevronDown className="ml-1 h-6 w-4" />
+                      <ChevronDown className="ml-1 h-6 w-4 font-semibold" />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent className="bg-[#18181b] border rounded-lg">
                       {contentTypes.map(type => (
@@ -328,12 +322,12 @@ export default function Page() {
                     onClick={handleSend}
                     disabled={loading || !input.trim()}
                     className="cursor-pointer p-1.5 
-                      transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled:cursor-not-allowed bg-white text-black rounded-lg"
                   >
                     {loading ? (
-                      <Ellipsis className="h-5 w-5 animate-spin" />
+                      <Disc className="h-5 w-5 font-bold" />
                     ) : (
-                      <SendHorizonal width={20} height={20} />
+                      <ArrowRight width={18} height={18} className="font-bold"/>
                     )}
                   </button>
                 </div>
