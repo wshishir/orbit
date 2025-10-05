@@ -36,3 +36,14 @@ export async function generateContent(
     throw new Error("Failed to generate content")
   }
 }
+
+export async function generateContentStream(
+  prompt: string,
+  contentType: keyof typeof contentTypePrompts = "GENERAL"
+) {
+  const fullPrompt = contentTypePrompts[contentType] + prompt
+  
+  const result = await model.generateContentStream(fullPrompt)
+  
+  return result.stream
+}

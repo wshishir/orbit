@@ -97,11 +97,11 @@ export default function Page() {
 
   const handleSend = async () => {
     if (!input.trim() || loading) return
-    
+
     setLoading(true)
     const userInput = input
     setInput("") // Clear input immediately
-    
+
     // Add user message to UI immediately
     const tempUserMessage: Message = {
       id: Date.now().toString(),
@@ -111,7 +111,17 @@ export default function Page() {
       createdAt: new Date().toISOString()
     }
     setMessages(prev => [...prev, tempUserMessage])
-    
+
+    // Add temporary AI message for streaming
+    const tempAiMessage: Message = {
+      id: (Date.now() + 1).toString(),
+      content: "",
+      role: "ASSISTANT",
+      contentType,
+      createdAt: new Date().toISOString()
+    }
+    setMessages(prev => [...prev, tempAiMessage])
+
     try {
       const response = await fetch("/api/generate", {
         method: "POST",
@@ -122,32 +132,67 @@ export default function Page() {
           chatId: currentChatId
         })
       })
-      
+
       if (!response.ok) {
-        const errorData = await response.json()
-        console.error("API Error:", errorData)
-        throw new Error(errorData.error || "Failed to generate")
+        throw new Error("Failed to generate")
       }
-      
-      const data = await response.json()
-      
-      // Update with real messages from server
-      setMessages(prev => [
-        ...prev.slice(0, -1), // Remove temp message
-        data.userMessage,
-        data.aiMessage
-      ])
-      
+
+      const reader = response.body?.getReader()
+      const decoder = new TextDecoder()
+
+      if (!reader) throw new Error("No reader available")
+
+      let streamedContent = ""
+      let newChatId = currentChatId
+      let finalUserMessage = tempUserMessage
+
+      while (true) {
+        const { done, value } = await reader.read()
+        if (done) break
+
+        const chunk = decoder.decode(value)
+        const lines = chunk.split('\n')
+
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            const data = JSON.parse(line.slice(6))
+
+            if (data.type === 'init') {
+              newChatId = data.chatId
+              finalUserMessage = data.userMessage
+            } else if (data.type === 'chunk') {
+              streamedContent += data.text
+              // Update the AI message content in real-time
+              setMessages(prev => {
+                const newMessages = [...prev]
+                newMessages[newMessages.length - 1] = {
+                  ...newMessages[newMessages.length - 1],
+                  content: streamedContent
+                }
+                return newMessages
+              })
+            } else if (data.type === 'done') {
+              // Replace temp messages with final ones
+              setMessages(prev => [
+                ...prev.slice(0, -2),
+                finalUserMessage,
+                data.aiMessage
+              ])
+            }
+          }
+        }
+      }
+
       // Update URL if new chat was created
-      if (!currentChatId && data.chatId) {
-        setCurrentChatId(data.chatId)
-        router.push(`/new?chat=${data.chatId}`)
+      if (!currentChatId && newChatId) {
+        setCurrentChatId(newChatId)
+        router.push(`/new?chat=${newChatId}`)
       }
-      
+
     } catch (error) {
       console.error("Failed to send message:", error)
-      // Remove the temporary message on error
-      setMessages(prev => prev.slice(0, -1))
+      // Remove the temporary messages on error
+      setMessages(prev => prev.slice(0, -2))
     } finally {
       setLoading(false)
     }

@@ -4,7 +4,7 @@ import { NextRequest, NextResponse } from "next/server"
 import { auth } from "@/lib/auth"
 import { headers } from "next/headers"
 import { db } from "@/lib/db"
-import { generateContent } from "@/lib/gemini"
+import { generateContentStream } from "@/lib/gemini"
 
 export async function POST(request: NextRequest) {
   try {
@@ -54,31 +54,74 @@ export async function POST(request: NextRequest) {
         contentType: contentType || "GENERAL",
       }
     })
-    
-    // Generate AI response
-    const aiResponse = await generateContent(prompt, contentType)
-    
-    // Save AI message
-    const aiMessage = await db.message.create({
-      data: {
-        chatId: currentChatId,
-        content: aiResponse,
-        role: "ASSISTANT",
-        contentType: contentType || "GENERAL",
+
+    // Get streaming response
+    const stream = await generateContentStream(prompt, contentType)
+
+    let fullText = ""
+
+    // Create a ReadableStream for the response
+    const encoder = new TextEncoder()
+    const readableStream = new ReadableStream({
+      async start(controller) {
+        try {
+          // Send initial metadata
+          controller.enqueue(
+            encoder.encode(`data: ${JSON.stringify({
+              type: 'init',
+              chatId: currentChatId,
+              userMessage
+            })}\n\n`)
+          )
+
+          // Stream the AI response chunks
+          for await (const chunk of stream) {
+            const text = chunk.text()
+            fullText += text
+            controller.enqueue(
+              encoder.encode(`data: ${JSON.stringify({
+                type: 'chunk',
+                text
+              })}\n\n`)
+            )
+          }
+
+          // Save the complete AI message to database
+          const aiMessage = await db.message.create({
+            data: {
+              chatId: currentChatId,
+              content: fullText,
+              role: "ASSISTANT",
+              contentType: contentType || "GENERAL",
+            }
+          })
+
+          await db.chat.update({
+            where: { id: currentChatId },
+            data: { updatedAt: new Date() }
+          })
+
+          // Send completion message
+          controller.enqueue(
+            encoder.encode(`data: ${JSON.stringify({
+              type: 'done',
+              aiMessage
+            })}\n\n`)
+          )
+
+          controller.close()
+        } catch (error) {
+          controller.error(error)
+        }
       }
     })
-    
-    // Update chat's updatedAt
-    await db.chat.update({
-      where: { id: currentChatId },
-      data: { updatedAt: new Date() }
-    })
-    
-    // Return both messages and chatId
-    return NextResponse.json({
-      chatId: currentChatId,
-      userMessage,
-      aiMessage,
+
+    return new Response(readableStream, {
+      headers: {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache',
+        'Connection': 'keep-alive',
+      },
     })
     
   } catch (error) {
