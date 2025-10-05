@@ -13,6 +13,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import Markdown from 'markdown-to-jsx';
+import toast, { Toaster } from 'react-hot-toast';
 import {
   SidebarInset,
   SidebarProvider,
@@ -36,12 +37,14 @@ export default function Page() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const notify = () => toast('Copied to Clipboard.');
   
   const [messages, setMessages] = useState<Message[]>([])
   const [input, setInput] = useState("")
   const [contentType, setContentType] = useState("GENERAL")
   const [loading, setLoading] = useState(false)
   const [currentChatId, setCurrentChatId] = useState<string | null>(null)
+  const [hoveredMessageId, setHoveredMessageId]= useState<string | null>(null)
 
   // Get chatId from URL
   useEffect(() => {
@@ -188,6 +191,16 @@ export default function Page() {
     textareaRef.current?.focus()
   }
 
+  const handleCopy = async (text: string) => {
+    try{
+      await navigator.clipboard.writeText(text)
+      toast.success('Copied to Clipboard.')
+    }catch(err) {
+      console.log("Failed to copy text:", err)
+      toast.error('Failed to copy')
+    }
+  }
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -242,27 +255,29 @@ export default function Page() {
                 {messages.map((message) => (
                   <div
                     key={message.id}
-                    className={`${
+                    onMouseEnter={() => setHoveredMessageId(message.id)}
+                    onMouseLeave={() => setHoveredMessageId(null)}
+                    className={`relative ${
                       message.role === "USER" 
                         ? "ml-auto max-w-[80%]" 
                         : "mr-auto max-w-[80%]"
                     }`}
                   >
                     <div
-                      className={`p-4 rounded-lg ${
+                      className={`p-4 rounded-xl rounded-tr-none ${
                         message.role === "USER"
-                          ? "bg-[#262626] text-white"
-                          : "bg-[#27272a] text-gray-200"
+                          ? "bg-[#1f1f1f] text-white"
+                          : "bg-transparent text-gray-200"
                       }`}
                     >
                       <Markdown
       options={{
         overrides: {
           h1: { props: { className: 'text-3xl font-bold mb-4' } },
-          h2: { props: { className: 'text-2xl font-bold mb-3' } },
+          h2: { props: { className: 'text-3xl font-bold mb-3' } },
           h3: { props: { className: 'text-xl font-semibold mb-2' } },
           p: { props: { className: 'text-base mb-4 leading-relaxed' } },
-          ul: { props: { className: 'list-disc ml-6 mb-4' } },
+          ul: { props: { className: 'list-disc text-xl ml-6 mb-4' } },
           ol: { props: { className: 'list-decimal ml-6 mb-4' } },
           code: { props: { className: 'bg-gray-100 px-2 py-1 rounded' } },
         }
@@ -271,7 +286,17 @@ export default function Page() {
       {message.content}
     </Markdown>
                     </div>
-                    <span className="flex justify-end mt-1 cursor-pointer mr-1"><Copy className="w-4 h-4"/></span>
+                    <div>
+                    {hoveredMessageId === message.id && (
+                     <button 
+                      onClick={() => handleCopy(message.content)}
+                       className="absolute -bottom-7 right-2 p-2 cursor-pointer hover:bg-black/50"
+                            >
+                    <Copy className="w-4 h-4"/>
+                    </button>
+                     )}
+                     <Toaster/>
+                     </div>
                   </div>
                 ))}
                 {loading && (
