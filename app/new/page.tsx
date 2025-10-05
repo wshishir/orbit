@@ -249,7 +249,7 @@ export default function Page() {
           )}
 
           {/* Messages Area */}
-          <div className="flex-1 overflow-y-auto p-6 ">
+          <div className="flex-1 overflow-y-auto p-6 custom-scrollbar">
             {messages.length > 0 && (
               <div className="max-w-3xl mx-auto space-y-6">
                 {messages.map((message) => (
@@ -290,7 +290,7 @@ export default function Page() {
                     {hoveredMessageId === message.id && (
                      <button 
                       onClick={() => handleCopy(message.content)}
-                       className="absolute -bottom-7 right-2 p-2 cursor-pointer hover:bg-black/50"
+                       className="absolute -bottom-6 right-2 p-2 cursor-pointer hover:bg-[#1f1f1f]/50 rounded-lg"
                             >
                     <Copy className="w-4 h-4"/>
                     </button>
