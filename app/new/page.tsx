@@ -150,34 +150,39 @@ export default function Page() {
         const { done, value } = await reader.read()
         if (done) break
 
-        const chunk = decoder.decode(value)
+        const chunk = decoder.decode(value, { stream: true })
         const lines = chunk.split('\n')
 
         for (const line of lines) {
           if (line.startsWith('data: ')) {
-            const data = JSON.parse(line.slice(6))
+            try {
+              const data = JSON.parse(line.slice(6))
 
-            if (data.type === 'init') {
-              newChatId = data.chatId
-              finalUserMessage = data.userMessage
-            } else if (data.type === 'chunk') {
-              streamedContent += data.text
-              // Update the AI message content in real-time
-              setMessages(prev => {
-                const newMessages = [...prev]
-                newMessages[newMessages.length - 1] = {
-                  ...newMessages[newMessages.length - 1],
-                  content: streamedContent
-                }
-                return newMessages
-              })
-            } else if (data.type === 'done') {
-              // Replace temp messages with final ones
-              setMessages(prev => [
-                ...prev.slice(0, -2),
-                finalUserMessage,
-                data.aiMessage
-              ])
+              if (data.type === 'init') {
+                newChatId = data.chatId
+                finalUserMessage = data.userMessage
+              } else if (data.type === 'chunk') {
+                streamedContent += data.text
+                // Update the AI message content in real-time
+                setMessages(prev => {
+                  const newMessages = [...prev]
+                  newMessages[newMessages.length - 1] = {
+                    ...newMessages[newMessages.length - 1],
+                    content: streamedContent
+                  }
+                  return newMessages
+                })
+              } else if (data.type === 'done') {
+                // Replace temp messages with final ones
+                setMessages(prev => [
+                  ...prev.slice(0, -2),
+                  finalUserMessage,
+                  data.aiMessage
+                ])
+              }
+            } catch (e) {
+              // Skip malformed JSON
+              continue
             }
           }
         }
@@ -211,6 +216,7 @@ export default function Page() {
     { value: "REPORT", label: "Report" },
     { value: "LINKEDIN_POST", label: "LinkedIn Post" },
     { value: "TWEET", label: "Tweet" },
+    { value: "EMAIL", label: "Email" },
   ]
   const dummyPrompts = [
     {

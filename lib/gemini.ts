@@ -14,6 +14,7 @@ const contentTypePrompts = {
   LINKEDIN_POST: "Write an engaging LinkedIn post (keep it professional, under 1300 characters) about: ",
   TWEET: "Write a concise, engaging tweet (max 280 characters) about: ",
   GENERAL: "Please help with: ",
+  EMAIL: "Write a professional email about: ",
 }
 
 // Function to generate content

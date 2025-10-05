@@ -116,4 +116,5 @@ enum ContentType {
   LINKEDIN_POST
   TWEET
   GENERAL
+  EMAIL
 }
