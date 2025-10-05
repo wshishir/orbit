@@ -12,7 +12,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import ReactMarkdown from 'react-markdown'
+import Markdown from 'markdown-to-jsx';
 import {
   SidebarInset,
   SidebarProvider,
@@ -255,17 +255,21 @@ export default function Page() {
                           : "bg-[#27272a] text-gray-200"
                       }`}
                     >
-                      <ReactMarkdown 
-  components={{
-    h1: ({node, ...props}) => <h1 className="text-2xl font-bold mt-4 mb-2" {...props} />,
-    h2: ({node, ...props}) => <h2 className="text-xl font-semibold mt-3 mb-2" {...props} />,
-    h3: ({node, ...props}) => <h3 className="text-lg font-semibold mt-2 mb-1" {...props} />,
-    strong: ({node, ...props}) => <strong className="font-bold" {...props} />,
-    p: ({node, ...props}) => <p className="mb-3 text-md" {...props} />,
-  }}
->
-  {message.content}
-</ReactMarkdown>
+                      <Markdown
+      options={{
+        overrides: {
+          h1: { props: { className: 'text-3xl font-bold mb-4' } },
+          h2: { props: { className: 'text-2xl font-bold mb-3' } },
+          h3: { props: { className: 'text-xl font-semibold mb-2' } },
+          p: { props: { className: 'text-base mb-4 leading-relaxed' } },
+          ul: { props: { className: 'list-disc ml-6 mb-4' } },
+          ol: { props: { className: 'list-decimal ml-6 mb-4' } },
+          code: { props: { className: 'bg-gray-100 px-2 py-1 rounded' } },
+        }
+      }}
+    >
+      {message.content}
+    </Markdown>
                     </div>
                     <span className="flex justify-end mt-1 cursor-pointer mr-1"><Copy className="w-4 h-4"/></span>
                   </div>
