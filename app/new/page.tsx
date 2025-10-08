@@ -134,7 +134,9 @@ export default function Page() {
       })
 
       if (!response.ok) {
-        throw new Error("Failed to generate")
+        const errorData = await response.json().catch(() => ({ error: 'Unknown error' }))
+        console.error("API Error:", errorData)
+        throw new Error(errorData.error || "Failed to generate")
       }
 
       const reader = response.body?.getReader()
@@ -231,7 +233,7 @@ export default function Page() {
     },
     {
       text: "Generate an email to reply to a job offer.",
-      type: "ARTICLE",
+      type: "EMAIl",
       icon: FileText,
     }
   ]
